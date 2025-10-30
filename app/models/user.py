@@ -42,7 +42,7 @@ class User(db.Model):
     # Bank info
     pix_key = db.Column(db.String(200))
     bank_name = db.Column(db.String(100))
-    account_type = db.Column(db.String(20))
+    bank_account_type = db.Column(db.String(20))  # Renamed to avoid conflict with user account_type
     agency = db.Column(db.String(20))
     account_number = db.Column(db.String(20))
     
@@ -72,10 +72,20 @@ class User(db.Model):
             'id': self.id,
             'name': self.name,
             'preferredName': self.preferred_name,
+            'preferred_name': self.preferred_name,  # Add snake_case for frontend compatibility
             'socialName': self.social_name,
             'email': self.email,
             'accountType': self.account_type,
+            'user_type': self.account_type,  # Add user_type for frontend compatibility
             'phone': self.phone,
+            'cpf': self.cpf,
+            'cep': self.cep,
+            'street': self.street,
+            'number': self.number,
+            'complement': self.complement,
+            'neighborhood': self.neighborhood,
+            'city': self.city,
+            'state': self.state,
             'address': {
                 'cep': self.cep,
                 'street': self.street,
@@ -86,7 +96,8 @@ class User(db.Model):
                 'state': self.state
             },
             'createdAt': self.created_at.isoformat() if self.created_at else None,
-            'profilePhoto': self.profile_photo
+            'profilePhoto': self.profile_photo,
+            'profile_photo': self.profile_photo  # Add snake_case for frontend compatibility
         }
         
         if self.account_type == 'professional':
@@ -99,15 +110,15 @@ class User(db.Model):
             data['services'] = {
                 'online': {
                     'available': self.online_service,
-                    'price': float(self.online_price) if self.online_price else None
+                    'price': float(self.online_price) if self.online_price is not None else None
                 },
                 'inPerson': {
                     'available': self.in_person_service,
-                    'price': float(self.in_person_price) if self.in_person_price else None
+                    'price': float(self.in_person_price) if self.in_person_price is not None else None
                 },
                 'home': {
                     'available': self.home_service,
-                    'price': float(self.home_price) if self.home_price else None
+                    'price': float(self.home_price) if self.home_price is not None else None
                 }
             }
             
@@ -115,7 +126,7 @@ class User(db.Model):
                 data['bankInfo'] = {
                     'pixKey': self.pix_key,
                     'bankName': self.bank_name,
-                    'accountType': self.account_type,
+                    'accountType': self.bank_account_type,
                     'agency': self.agency,
                     'accountNumber': self.account_number
                 }

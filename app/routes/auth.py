@@ -59,11 +59,15 @@ def register():
             user.registration_number = data.get('registrationNumber')
             user.description = data.get('description')
             user.online_service = data.get('onlineService', False)
-            user.online_price = data.get('onlinePrice')
+            # Convert price to float, handling empty strings and None
+            online_price = data.get('onlinePrice')
+            user.online_price = float(online_price) if online_price and str(online_price).strip() else None
             user.in_person_service = data.get('inPersonService', False)
-            user.in_person_price = data.get('inPersonPrice')
+            in_person_price = data.get('inPersonPrice')
+            user.in_person_price = float(in_person_price) if in_person_price and str(in_person_price).strip() else None
             user.home_service = data.get('homeService', False)
-            user.home_price = data.get('homePrice')
+            home_price = data.get('homePrice')
+            user.home_price = float(home_price) if home_price and str(home_price).strip() else None
         
         db.session.add(user)
         db.session.flush()  # Get user ID

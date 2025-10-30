@@ -78,15 +78,18 @@ def update_profile():
             if 'onlineService' in data:
                 user.online_service = data['onlineService']
             if 'onlinePrice' in data:
-                user.online_price = data['onlinePrice']
+                price = data['onlinePrice']
+                user.online_price = float(price) if price and str(price).strip() else None
             if 'inPersonService' in data:
                 user.in_person_service = data['inPersonService']
             if 'inPersonPrice' in data:
-                user.in_person_price = data['inPersonPrice']
+                price = data['inPersonPrice']
+                user.in_person_price = float(price) if price and str(price).strip() else None
             if 'homeService' in data:
                 user.home_service = data['homeService']
             if 'homePrice' in data:
-                user.home_price = data['homePrice']
+                price = data['homePrice']
+                user.home_price = float(price) if price and str(price).strip() else None
             
             # Update specialties
             if 'specialties' in data:
@@ -104,8 +107,8 @@ def update_profile():
                 user.pix_key = data['pixKey']
             if 'bankName' in data:
                 user.bank_name = data['bankName']
-            if 'accountType' in data:
-                user.account_type = data['accountType']
+            if 'bankAccountType' in data:
+                user.bank_account_type = data['bankAccountType']
             if 'agency' in data:
                 user.agency = data['agency']
             if 'accountNumber' in data:
