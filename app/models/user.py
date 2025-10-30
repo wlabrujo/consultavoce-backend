@@ -46,6 +46,9 @@ class User(db.Model):
     agency = db.Column(db.String(20))
     account_number = db.Column(db.String(20))
     
+    # Profile
+    profile_photo = db.Column(db.Text)  # Base64 encoded image
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -82,7 +85,8 @@ class User(db.Model):
                 'city': self.city,
                 'state': self.state
             },
-            'createdAt': self.created_at.isoformat() if self.created_at else None
+            'createdAt': self.created_at.isoformat() if self.created_at else None,
+            'profilePhoto': self.profile_photo
         }
         
         if self.account_type == 'professional':
