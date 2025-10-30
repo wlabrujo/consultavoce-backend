@@ -96,6 +96,17 @@ def register():
         error_details = traceback.format_exc()
         print(f'Error in register: {str(e)}')
         print(f'Traceback: {error_details}')
+        
+        # Check for unique constraint errors
+        error_msg = str(e).lower()
+        if 'unique constraint' in error_msg or 'duplicate' in error_msg:
+            if 'cpf' in error_msg:
+                return jsonify({'error': 'Este CPF já está cadastrado no sistema. Tente fazer login ou use outro CPF.'}), 400
+            elif 'email' in error_msg:
+                return jsonify({'error': 'Este email já está cadastrado no sistema. Tente fazer login ou use outro email.'}), 400
+            else:
+                return jsonify({'error': 'Já existe um cadastro com esses dados. Tente fazer login.'}), 400
+        
         return jsonify({'error': f'Erro ao realizar cadastro: {str(e)}'}), 500
 
 

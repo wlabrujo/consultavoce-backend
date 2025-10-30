@@ -60,15 +60,7 @@ def update_profile():
         if 'state' in data:
             user.state = data['state']
         
-        # Update profile photo
-        if 'profilePhoto' in data:
-            if data['profilePhoto'] is None:
-                user.profile_photo = None
-            elif data['profilePhoto'].startswith('data:image/'):
-                if len(data['profilePhoto']) > 7000000:
-                    return jsonify({'error': 'Imagem muito grande. Máximo 5MB'}), 400
-                user.profile_photo = data['profilePhoto']
-        
+
         # Update professional fields
         if user.account_type == 'professional':
             if 'description' in data:
@@ -128,65 +120,5 @@ def update_profile():
 
 
 
-@user_bp.route('/profile/photo', methods=['POST'])
-@token_required
-def upload_profile_photo():
-    """Upload profile photo (base64)"""
-    try:
-        user = User.query.get(request.user_id)
-        
-        if not user:
-            return jsonify({'error': 'Usuário não encontrado'}), 404
-        
-        data = request.get_json()
-        
-        if 'photo' not in data:
-            return jsonify({'error': 'Foto não fornecida'}), 400
-        
-        photo_data = data['photo']
-        
-        # Validate base64 format (should start with data:image/)
-        if not photo_data.startswith('data:image/'):
-            return jsonify({'error': 'Formato de imagem inválido'}), 400
-        
-        # Check size (limit to ~5MB base64 string)
-        if len(photo_data) > 7000000:  # ~5MB in base64
-            return jsonify({'error': 'Imagem muito grande. Máximo 5MB'}), 400
-        
-        user.profile_photo = photo_data
-        db.session.commit()
-        
-        return jsonify({
-            'message': 'Foto de perfil atualizada com sucesso!',
-            'user': user.to_dict(include_sensitive=True)
-        }), 200
-        
-    except Exception as e:
-        db.session.rollback()
-        print(f'Error in upload_profile_photo: {str(e)}')
-        return jsonify({'error': 'Erro ao fazer upload da foto'}), 500
 
-
-@user_bp.route('/profile/photo', methods=['DELETE'])
-@token_required
-def delete_profile_photo():
-    """Delete profile photo"""
-    try:
-        user = User.query.get(request.user_id)
-        
-        if not user:
-            return jsonify({'error': 'Usuário não encontrado'}), 404
-        
-        user.profile_photo = None
-        db.session.commit()
-        
-        return jsonify({
-            'message': 'Foto de perfil removida com sucesso!',
-            'user': user.to_dict(include_sensitive=True)
-        }), 200
-        
-    except Exception as e:
-        db.session.rollback()
-        print(f'Error in delete_profile_photo: {str(e)}')
-        return jsonify({'error': 'Erro ao remover foto'}), 500
 

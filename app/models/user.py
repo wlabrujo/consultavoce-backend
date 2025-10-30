@@ -95,9 +95,7 @@ class User(db.Model):
                 'city': self.city,
                 'state': self.state
             },
-            'createdAt': self.created_at.isoformat() if self.created_at else None,
-            'profilePhoto': self.profile_photo,
-            'profile_photo': self.profile_photo  # Add snake_case for frontend compatibility
+            'createdAt': self.created_at.isoformat() if self.created_at else None
         }
         
         if self.account_type == 'professional':
