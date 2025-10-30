@@ -13,7 +13,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     account_type = db.Column(db.String(20), nullable=False)  # 'patient' or 'professional'
     phone = db.Column(db.String(20))
-    cpf = db.Column(db.String(14), unique=True)
+    cpf = db.Column(db.String(14))  # Not unique - same CPF can have patient and professional accounts
     
     # Address
     cep = db.Column(db.String(9))
