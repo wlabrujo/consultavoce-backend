@@ -88,8 +88,11 @@ def register():
         
     except Exception as e:
         db.session.rollback()
+        import traceback
+        error_details = traceback.format_exc()
         print(f'Error in register: {str(e)}')
-        return jsonify({'error': 'Erro ao realizar cadastro'}), 500
+        print(f'Traceback: {error_details}')
+        return jsonify({'error': f'Erro ao realizar cadastro: {str(e)}'}), 500
 
 
 @auth_bp.route('/login', methods=['POST'])
