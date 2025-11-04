@@ -89,11 +89,18 @@ def register():
             email=data['email'],
             password=hash_password(data['password']),
             name=data['name'],
-            preferred_name=data.get('preferred_name', ''),
-            social_name=data.get('social_name', ''),
+            preferred_name=data.get('preferredName', ''),
+            social_name=data.get('socialName', ''),
             phone=data.get('phone', ''),
             cpf=data.get('cpf', ''),
-            user_type=data['userType']
+            user_type=data['userType'],
+            cep=data.get('cep', ''),
+            street=data.get('street', ''),
+            number=data.get('number', ''),
+            complement=data.get('complement', ''),
+            neighborhood=data.get('neighborhood', ''),
+            city=data.get('city', ''),
+            state=data.get('state', '')
         )
         
         # Adicionar campos específicos de profissional
@@ -102,13 +109,6 @@ def register():
             user.regulatory_body = data.get('regulatoryBody', '')
             user.registration_number = data.get('registrationNumber', '')
             user.description = data.get('description', '')
-            
-            # Adicionar especialidades
-            specialties = data.get('specialties', [])
-            if specialties:
-                for spec_name in specialties:
-                    specialty = Specialty(name=spec_name)
-                    user.specialties.append(specialty)
         
         db.add(user)
         db.commit()
