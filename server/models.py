@@ -5,8 +5,8 @@ from database import Base
 
 # Tabela de associação para especialidades (muitos-para-muitos)
 user_specialties = Table('user_specialties', Base.metadata,
-    Column('user_id', Integer, ForeignKey('users.id')),
-    Column('specialty', String(100))
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('specialty_id', Integer, ForeignKey('specialties.id'), primary_key=True)
 )
 
 class User(Base):
@@ -51,6 +51,7 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relacionamentos
+    specialties = relationship('Specialty', secondary=user_specialties, back_populates='users')
     appointments_as_patient = relationship('Appointment', foreign_keys='Appointment.patient_id', back_populates='patient')
     appointments_as_professional = relationship('Appointment', foreign_keys='Appointment.professional_id', back_populates='professional')
     reviews_received = relationship('Review', foreign_keys='Review.professional_id', back_populates='professional')
@@ -60,10 +61,9 @@ class Specialty(Base):
     __tablename__ = 'specialties'
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), unique=True, nullable=False, index=True)
     
-    user = relationship('User')
+    users = relationship('User', secondary=user_specialties, back_populates='specialties')
 
 class Appointment(Base):
     __tablename__ = 'appointments'

@@ -56,6 +56,10 @@ def user_to_dict(user):
             'photo_url': user.photo_url
         })
         
+        # Adicionar especialidades
+        if hasattr(user, 'specialties') and user.specialties:
+            user_dict['specialties'] = [spec.name for spec in user.specialties]
+        
         # Adicionar dados bancários
         if user.pix_key or user.bank_account:
             user_dict['banking'] = {
@@ -111,6 +115,24 @@ def register():
             user.description = data.get('description', '')
         
         db.add(user)
+        db.flush()  # Flush para obter o user.id
+        
+        # Adicionar especialidades (se profissional)
+        if data['userType'] == 'professional' and 'specialties' in data:
+            specialties_list = data.get('specialties', [])
+            if isinstance(specialties_list, list) and specialties_list:
+                for spec_name in specialties_list:
+                    if spec_name and spec_name.strip():
+                        # Buscar ou criar especialidade
+                        specialty = db.query(Specialty).filter(Specialty.name == spec_name).first()
+                        if not specialty:
+                            specialty = Specialty(name=spec_name)
+                            db.add(specialty)
+                            db.flush()
+                        # Adicionar ao usuário
+                        if specialty not in user.specialties:
+                            user.specialties.append(specialty)
+        
         db.commit()
         db.refresh(user)
         
