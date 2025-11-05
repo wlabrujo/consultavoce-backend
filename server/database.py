@@ -33,38 +33,17 @@ def get_db():
 
 # Inicializar banco de dados
 def init_db():
-    import models  # Importar modelos
+    """Inicializar banco de dados
     
-    # Criar tabelas (se não existirem)
-    Base.metadata.create_all(bind=engine)
+    NOTA: As migrações são gerenciadas pelo Alembic.
+    Esta função é mantida para compatibilidade, mas o Alembic
+    deve ser usado para criar/modificar tabelas.
     
-    # Adicionar colunas faltantes (migração manual)
-    from sqlalchemy import inspect, text
-    inspector = inspect(engine)
-    
-    # Verificar se a tabela users existe
-    if 'users' in inspector.get_table_names():
-        existing_columns = [col['name'] for col in inspector.get_columns('users')]
-        
-        # Lista de colunas que devem existir
-        required_columns = {
-            'cep': 'VARCHAR(10)',
-            'street': 'VARCHAR(255)',
-            'number': 'VARCHAR(20)',
-            'complement': 'VARCHAR(255)',
-            'neighborhood': 'VARCHAR(100)',
-            'city': 'VARCHAR(100)',
-            'state': 'VARCHAR(2)'
-        }
-        
-        # Adicionar colunas faltantes
-        with engine.connect() as conn:
-            for col_name, col_type in required_columns.items():
-                if col_name not in existing_columns:
-                    try:
-                        conn.execute(text(f'ALTER TABLE users ADD COLUMN {col_name} {col_type}'))
-                        conn.commit()
-                        print(f'✅ Coluna {col_name} adicionada com sucesso!')
-                    except Exception as e:
-                        print(f'⚠️  Erro ao adicionar coluna {col_name}: {e}')
+    Para aplicar migrações, execute: python run_migrations.py
+    """
+    try:
+        print("✅ Database initialization - migrations managed by Alembic")
+        print("ℹ️  Run 'python run_migrations.py' to apply migrations")
+    except Exception as e:
+        print(f"❌ Error initializing database: {e}")
 
