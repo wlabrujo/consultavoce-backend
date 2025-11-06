@@ -79,9 +79,11 @@ def get_professional(professional_id):
         
         prof_dict = user_to_dict(professional)
         
-        # Adicionar especialidades
-        specialties = db.query(Specialty).filter(Specialty.user_id == professional_id).all()
-        prof_dict['specialties'] = [s.name for s in specialties]
+        # Adicionar especialidades (já vem do relacionamento)
+        if hasattr(professional, 'specialties') and professional.specialties:
+            prof_dict['specialties'] = [s.name for s in professional.specialties]
+        else:
+            prof_dict['specialties'] = []
         
         # Adicionar avaliações
         reviews = db.query(Review).filter(Review.professional_id == professional_id).all()
