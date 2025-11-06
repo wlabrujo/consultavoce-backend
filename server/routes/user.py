@@ -99,6 +99,30 @@ def update_profile():
                 user.bank_name = banking.get('bank_name')
                 user.bank_agency = banking.get('bank_agency')
                 user.bank_account = banking.get('bank_account')
+            
+            # Atualizar dados bancários (formato direto)
+            if 'pixKey' in data:
+                user.pix_key = data['pixKey']
+            if 'bankName' in data:
+                user.bank_name = data['bankName']
+            if 'bankAgency' in data:
+                user.bank_agency = data['bankAgency']
+            if 'bankAccount' in data:
+                user.bank_account = data['bankAccount']
+            
+            # Atualizar preços de consultas
+            if 'onlinePrice' in data:
+                user.online_price = data['onlinePrice']
+            if 'inPersonPrice' in data:
+                user.in_person_price = data['inPersonPrice']
+            if 'homePrice' in data:
+                user.home_price = data['homePrice']
+            if 'onlineEnabled' in data:
+                user.online_enabled = data['onlineEnabled']
+            if 'inPersonEnabled' in data:
+                user.in_person_enabled = data['inPersonEnabled']
+            if 'homeEnabled' in data:
+                user.home_enabled = data['homeEnabled']
         
         db.commit()
         db.refresh(user)

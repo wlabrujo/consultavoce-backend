@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, Text, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
@@ -42,6 +42,14 @@ class User(Base):
     bank_name = Column(String(100))
     bank_agency = Column(String(20))
     bank_account = Column(String(50))
+    
+    # Preços de consultas (profissionais)
+    online_price = Column(Float)
+    in_person_price = Column(Float)
+    home_price = Column(Float)
+    online_enabled = Column(Boolean, default=True)
+    in_person_enabled = Column(Boolean, default=True)
+    home_enabled = Column(Boolean, default=False)
     
     # Foto de perfil
     photo_url = Column(String(500))

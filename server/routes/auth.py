@@ -68,6 +68,16 @@ def user_to_dict(user):
                 'bank_agency': user.bank_agency,
                 'bank_account': user.bank_account
             }
+        
+        # Adicionar preços de consultas
+        user_dict['pricing'] = {
+            'online': user.online_price,
+            'in_person': user.in_person_price,
+            'home': user.home_price,
+            'online_enabled': user.online_enabled if user.online_enabled is not None else True,
+            'in_person_enabled': user.in_person_enabled if user.in_person_enabled is not None else True,
+            'home_enabled': user.home_enabled if user.home_enabled is not None else False
+        }
     
     return user_dict
 
