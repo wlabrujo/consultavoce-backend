@@ -129,7 +129,13 @@ def get_appointments():
         else:
             appointments = db.query(Appointment).filter(Appointment.professional_id == user_id).all()
         
+        from datetime import timedelta
+        import pytz
+        
         results = []
+        brasilia_tz = pytz.timezone('America/Sao_Paulo')
+        now_brasilia = datetime.now(brasilia_tz)
+        
         for apt in appointments:
             apt_dict = {
                 'id': apt.id,
@@ -140,8 +146,23 @@ def get_appointments():
                 'status': apt.status,
                 'notes': apt.notes,
                 'address': apt.address,
-                'created_at': apt.created_at.isoformat() if apt.created_at else None
+                'created_at': apt.created_at.isoformat() if apt.created_at else None,
+                'completed_at': apt.completed_at.isoformat() if apt.completed_at else None,
+                'disputed': apt.disputed
             }
+            
+            # Calcular se pode contestar (48h após completed_at)
+            if apt.status == 'completed' and apt.completed_at and user.user_type == 'patient':
+                if apt.completed_at.tzinfo is None:
+                    completed_at_aware = brasilia_tz.localize(apt.completed_at)
+                else:
+                    completed_at_aware = apt.completed_at.astimezone(brasilia_tz)
+                
+                deadline = completed_at_aware + timedelta(hours=48)
+                apt_dict['can_dispute'] = now_brasilia <= deadline and not apt.disputed
+                apt_dict['dispute_deadline'] = deadline.isoformat()
+            else:
+                apt_dict['can_dispute'] = False
             
             # Adicionar informações do outro usuário
             if user.user_type == 'patient':
