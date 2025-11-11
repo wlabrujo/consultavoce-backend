@@ -137,3 +137,22 @@ class Payment(Base):
     
     appointment = relationship('Appointment')
 
+
+class Availability(Base):
+    __tablename__ = 'availability'
+    
+    id = Column(Integer, primary_key=True, index=True)
+    professional_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    
+    day_of_week = Column(Integer, nullable=False)  # 0=Domingo, 1=Segunda, ..., 6=Sábado
+    start_time = Column(String(5), nullable=False)  # HH:MM
+    end_time = Column(String(5), nullable=False)    # HH:MM
+    
+    is_active = Column(Boolean, default=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relacionamento
+    professional = relationship('User', foreign_keys=[professional_id])
+

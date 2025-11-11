@@ -14,13 +14,14 @@ with app.app_context():
     init_db()
 
 # Importar rotas da API
-from routes import auth_bp, professional_bp, appointment_bp, user_bp
+from routes import auth_bp, professional_bp, appointment_bp, user_bp, availability_bp
 
 # Registrar blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(professional_bp, url_prefix='/api/professionals')
 app.register_blueprint(appointment_bp, url_prefix='/api/appointments')
 app.register_blueprint(user_bp, url_prefix='/api/users')
+app.register_blueprint(availability_bp, url_prefix='/api/availability')
 
 # Servir o frontend React
 @app.route('/')
