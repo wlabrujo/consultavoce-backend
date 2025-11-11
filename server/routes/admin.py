@@ -1,9 +1,29 @@
 from flask import Blueprint, request, jsonify
-from server.models import Appointment, User, Payment
-from server.database import SessionLocal
-from server.middleware import token_required
+from models import Appointment, User, Payment
+from database import SessionLocal
+import jwt
+import os
+from functools import wraps
 
 admin_bp = Blueprint('admin', __name__)
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'error': 'Token não fornecido'}), 401
+        
+        try:
+            if token.startswith('Bearer '):
+                token = token[7:]
+            data = jwt.decode(token, os.environ.get('SECRET_KEY', 'dev-secret-key'), algorithms=['HS256'])
+            user_id = data['user_id']
+        except:
+            return jsonify({'error': 'Token inválido'}), 401
+        
+        return f(user_id, *args, **kwargs)
+    return decorated
 
 @admin_bp.route('/disputes', methods=['GET'])
 @token_required
