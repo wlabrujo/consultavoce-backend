@@ -16,8 +16,11 @@ def search_professionals():
         state = request.args.get('state', '')
         profession = request.args.get('profession', '')
         
-        # Query base - apenas profissionais
-        query = db.query(User).filter(User.user_type == 'professional')
+        # Query base - apenas profissionais (excluir admin)
+        query = db.query(User).filter(
+            User.user_type == 'professional',
+            User.email != 'admin@vitabrasil.com'
+        )
         
         # Filtrar por especialidade
         if specialty:
@@ -68,10 +71,11 @@ def search_professionals():
 def get_professional(professional_id):
     db = SessionLocal()
     try:
-        # Buscar profissional
+        # Buscar profissional (excluir admin)
         professional = db.query(User).filter(
             User.id == professional_id,
-            User.user_type == 'professional'
+            User.user_type == 'professional',
+            User.email != 'admin@vitabrasil.com'
         ).first()
         
         if not professional:

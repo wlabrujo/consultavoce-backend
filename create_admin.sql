@@ -18,7 +18,7 @@ INSERT INTO users (
 VALUES (
     'Administrador VitaBrasil',
     'admin@vitabrasil.com',
-    'scrypt:32768:8:1$hP0bm5Eel1o6RnPC$6915a611ffaf3bc34a67c626cff803344529b33bc3d3610d0abe728a0d7d594f3a9f384fe982c75a2a74fc484c80e99707498d5f7d0afc7ef219e4e8a79f5946',
+    '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9',
     'professional',
     '(21) 00000-0000',
     NOW(),
@@ -36,5 +36,6 @@ SELECT id, name, email, user_type FROM users WHERE email = 'admin@vitabrasil.com
 -- ============================================
 -- Email: admin@vitabrasil.com
 -- Senha: admin123
+-- Hash: 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
 -- ============================================
 
