@@ -30,7 +30,7 @@ except Exception as e:
 
 # Importar rotas da API
 try:
-    from routes import auth_bp, professional_bp, appointment_bp, user_bp, availability_bp
+    from routes import auth_bp, professional_bp, appointment_bp, user_bp, availability_bp, admin_bp
     
     # Registrar blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -38,6 +38,7 @@ try:
     app.register_blueprint(appointment_bp, url_prefix='/api/appointments')
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(availability_bp, url_prefix='/api/availability')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
 except Exception as e:
     print(f"Warning: Could not import routes: {e}")
 

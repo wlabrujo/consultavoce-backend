@@ -48,6 +48,17 @@ def create_appointment():
         if not professional:
             return jsonify({'error': 'Profissional não encontrado'}), 404
         
+        # Verificar se horário já está ocupado
+        existing = db.query(Appointment).filter(
+            Appointment.professional_id == data['professional_id'],
+            Appointment.date == data['date'],
+            Appointment.time == data['time'],
+            Appointment.status.in_(['pending', 'confirmed', 'completed'])
+        ).first()
+        
+        if existing:
+            return jsonify({'error': 'Este horário já está ocupado. Por favor, escolha outro horário.'}), 400
+        
         # Calcular taxas
         price = float(data['price'])
         platform_fee = price * 0.10  # 10% para a plataforma

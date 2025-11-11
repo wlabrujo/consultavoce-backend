@@ -3,6 +3,7 @@ from .professional import professional_bp
 from .appointment import appointment_bp
 from .user import user_bp
 from .availability import availability_bp
+from .admin import admin_bp
 
-__all__ = ['auth_bp', 'professional_bp', 'appointment_bp', 'user_bp', 'availability_bp']
+__all__ = ['auth_bp', 'professional_bp', 'appointment_bp', 'user_bp', 'availability_bp', 'admin_bp']
 
