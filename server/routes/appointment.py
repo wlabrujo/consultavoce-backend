@@ -289,3 +289,186 @@ def cancel_appointment(appointment_id):
     finally:
         db.close()
 
+
+
+@appointment_bp.route('/<int:appointment_id>/confirm', methods=['PATCH'])
+def confirm_appointment(appointment_id):
+    """Profissional confirma o agendamento"""
+    db = SessionLocal()
+    try:
+        # Obter token
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Token não fornecido'}), 401
+        
+        token = auth_header.split(' ')[1] if ' ' in auth_header else auth_header
+        user_id = get_user_from_token(token)
+        
+        if not user_id:
+            return jsonify({'error': 'Token inválido'}), 401
+        
+        # Buscar agendamento
+        appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+        
+        if not appointment:
+            return jsonify({'error': 'Agendamento não encontrado'}), 404
+        
+        # Verificar se é o profissional
+        if appointment.professional_id != user_id:
+            return jsonify({'error': 'Apenas o profissional pode confirmar'}), 403
+        
+        # Verificar status
+        if appointment.status != 'pending':
+            return jsonify({'error': f'Consulta já está {appointment.status}'}), 400
+        
+        # Confirmar
+        appointment.status = 'confirmed'
+        db.commit()
+        
+        return jsonify({
+            'message': 'Agendamento confirmado com sucesso',
+            'appointment_id': appointment_id,
+            'status': 'confirmed'
+        }), 200
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+@appointment_bp.route('/<int:appointment_id>/complete', methods=['PATCH'])
+def complete_appointment(appointment_id):
+    """Profissional marca consulta como realizada"""
+    db = SessionLocal()
+    try:
+        from datetime import timezone
+        import pytz
+        
+        # Obter token
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Token não fornecido'}), 401
+        
+        token = auth_header.split(' ')[1] if ' ' in auth_header else auth_header
+        user_id = get_user_from_token(token)
+        
+        if not user_id:
+            return jsonify({'error': 'Token inválido'}), 401
+        
+        # Buscar agendamento
+        appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+        
+        if not appointment:
+            return jsonify({'error': 'Agendamento não encontrado'}), 404
+        
+        # Verificar se é o profissional
+        if appointment.professional_id != user_id:
+            return jsonify({'error': 'Apenas o profissional pode marcar como realizada'}), 403
+        
+        # Verificar status
+        if appointment.status not in ['pending', 'confirmed']:
+            return jsonify({'error': f'Consulta já está {appointment.status}'}), 400
+        
+        # Validar data/hora - só permite marcar realizada APÓS o horário da consulta
+        brasilia_tz = pytz.timezone('America/Sao_Paulo')
+        now_brasilia = datetime.now(brasilia_tz)
+        
+        # Converter data e hora da consulta para datetime
+        apt_datetime_str = f"{appointment.date} {appointment.time}:00"
+        apt_datetime = datetime.strptime(apt_datetime_str, '%Y-%m-%d %H:%M:%S')
+        apt_datetime_brasilia = brasilia_tz.localize(apt_datetime)
+        
+        if now_brasilia < apt_datetime_brasilia:
+            return jsonify({
+                'error': f'Não é possível marcar como realizada antes do horário da consulta ({appointment.date} {appointment.time})'
+            }), 400
+        
+        # Marcar como realizada com horário de Brasília
+        appointment.status = 'completed'
+        appointment.completed_at = now_brasilia
+        
+        db.commit()
+        
+        return jsonify({
+            'message': 'Consulta marcada como realizada. Paciente tem 48h para contestar.',
+            'appointment_id': appointment_id,
+            'status': 'completed',
+            'completed_at': now_brasilia.isoformat()
+        }), 200
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+@appointment_bp.route('/<int:appointment_id>/dispute', methods=['PATCH'])
+def dispute_appointment(appointment_id):
+    """Paciente contesta consulta realizada"""
+    db = SessionLocal()
+    try:
+        from datetime import timezone, timedelta
+        import pytz
+        
+        # Obter token
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Token não fornecido'}), 401
+        
+        token = auth_header.split(' ')[1] if ' ' in auth_header else auth_header
+        user_id = get_user_from_token(token)
+        
+        if not user_id:
+            return jsonify({'error': 'Token inválido'}), 401
+        
+        data = request.get_json()
+        
+        # Buscar agendamento
+        appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+        
+        if not appointment:
+            return jsonify({'error': 'Agendamento não encontrado'}), 404
+        
+        # Verificar se é o paciente
+        if appointment.patient_id != user_id:
+            return jsonify({'error': 'Apenas o paciente pode contestar'}), 403
+        
+        # Verificar status
+        if appointment.status != 'completed':
+            return jsonify({'error': 'Apenas consultas realizadas podem ser contestadas'}), 400
+        
+        # Verificar prazo de 48h
+        brasilia_tz = pytz.timezone('America/Sao_Paulo')
+        now_brasilia = datetime.now(brasilia_tz)
+        
+        # Garantir que completed_at está em timezone aware
+        if appointment.completed_at.tzinfo is None:
+            completed_at_aware = brasilia_tz.localize(appointment.completed_at)
+        else:
+            completed_at_aware = appointment.completed_at.astimezone(brasilia_tz)
+        
+        deadline = completed_at_aware + timedelta(hours=48)
+        
+        if now_brasilia > deadline:
+            return jsonify({'error': 'Prazo de 48h para contestação expirado'}), 400
+        
+        # Registrar contestação
+        appointment.disputed = True
+        appointment.dispute_reason = data.get('reason', '')
+        appointment.status = 'disputed'
+        
+        db.commit()
+        
+        return jsonify({
+            'message': 'Contestação registrada. Nossa equipe entrará em contato.',
+            'appointment_id': appointment_id,
+            'status': 'disputed'
+        }), 200
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
