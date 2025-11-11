@@ -242,3 +242,50 @@ def update_appointment(appointment_id):
     finally:
         db.close()
 
+
+@appointment_bp.route('/<int:appointment_id>', methods=['DELETE'])
+def cancel_appointment(appointment_id):
+    db = SessionLocal()
+    try:
+        # Obter token
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Token não fornecido'}), 401
+        
+        token = auth_header.split(' ')[1] if ' ' in auth_header else auth_header
+        user_id = get_user_from_token(token)
+        
+        if not user_id:
+            return jsonify({'error': 'Token inválido'}), 401
+        
+        # Buscar agendamento
+        appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+        
+        if not appointment:
+            return jsonify({'error': 'Agendamento não encontrado'}), 404
+        
+        # Verificar se usuário tem permissão (paciente ou profissional do agendamento)
+        if appointment.patient_id != user_id and appointment.professional_id != user_id:
+            return jsonify({'error': 'Sem permissão para cancelar este agendamento'}), 403
+        
+        # Atualizar status para cancelled
+        appointment.status = 'cancelled'
+        
+        # Atualizar pagamento se existir
+        payment = db.query(Payment).filter(Payment.appointment_id == appointment_id).first()
+        if payment:
+            payment.status = 'refunded'
+        
+        db.commit()
+        
+        return jsonify({
+            'message': 'Agendamento cancelado com sucesso',
+            'appointment_id': appointment_id
+        }), 200
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
