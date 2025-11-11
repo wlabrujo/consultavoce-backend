@@ -88,11 +88,16 @@ class Appointment(Base):
     platform_fee = Column(Float)  # 10% da plataforma
     professional_amount = Column(Float)  # 90% para o profissional
     
-    status = Column(String(20), default='pending')  # pending, confirmed, completed, cancelled
+    status = Column(String(20), default='pending')  # pending, confirmed, completed, cancelled, disputed
     
     # Informações adicionais
     notes = Column(Text)
     address = Column(Text)  # Para consultas domiciliares
+    
+    # Controle de conclusão
+    completed_at = Column(DateTime)  # Quando profissional marcou como realizada
+    disputed = Column(Boolean, default=False)  # Se paciente contestou
+    dispute_reason = Column(Text)  # Motivo da contestação
     
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
