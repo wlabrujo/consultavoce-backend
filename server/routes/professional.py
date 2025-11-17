@@ -19,7 +19,7 @@ def search_professionals():
         # Query base - apenas profissionais (excluir admin)
         query = db.query(User).filter(
             User.user_type == 'professional',
-            User.email != 'admin@vitabrasil.com'
+            User.email != 'admin@consultavoce.com.br'
         )
         
         # Filtrar por especialidade
@@ -75,7 +75,7 @@ def get_professional(professional_id):
         professional = db.query(User).filter(
             User.id == professional_id,
             User.user_type == 'professional',
-            User.email != 'admin@vitabrasil.com'
+            User.email != 'admin@consultavoce.com.br'
         ).first()
         
         if not professional:

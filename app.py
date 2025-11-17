@@ -49,7 +49,7 @@ except Exception as e:
 def health():
     return jsonify({
         'status': 'ok', 
-        'message': 'VitaBrasil API is running',
+        'message': 'Consulta Você API is running',
         'service': 'backend',
         'version': '1.0.0'
     })

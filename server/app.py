@@ -37,7 +37,7 @@ def serve(path=''):
 def health():
     return jsonify({
         'status': 'ok', 
-        'message': 'VitaBrasil API is running',
+        'message': 'Consulta Você API is running',
         'database': 'connected'
     })
 

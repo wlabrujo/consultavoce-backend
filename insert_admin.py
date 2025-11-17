@@ -24,8 +24,8 @@ try:
         updated_at
     )
     VALUES (
-        'Administrador VitaBrasil',
-        'admin@vitabrasil.com',
+        'Administrador Consulta Você',
+        'admin@consultavoce.com.br',
         %s,
         'professional',
         '(21) 00000-0000',
@@ -49,7 +49,7 @@ try:
     print(f"Email: {result[2]}")
     print(f"Tipo: {result[3]}")
     print("\n📧 Credenciais:")
-    print("Email: admin@vitabrasil.com")
+    print("Email: admin@consultavoce.com.br")
     print("Senha: admin123")
     
     cursor.close()

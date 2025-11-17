@@ -1,6 +1,6 @@
-# VitaBrasil Backend
+# Consulta Você Backend
 
-Backend API para o sistema VitaBrasil - Plataforma de agendamento de consultas médicas.
+Backend API para o sistema Consulta Você - Plataforma de agendamento de consultas com profissionais de saúde.
 
 ## Tecnologias
 

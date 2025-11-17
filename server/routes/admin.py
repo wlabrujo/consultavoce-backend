@@ -33,7 +33,7 @@ def get_disputes(user_id):
     try:
         # Verificar se é admin
         user = db.query(User).filter(User.id == user_id).first()
-        if not user or user.email != 'admin@vitabrasil.com':
+        if not user or user.email != 'admin@consultavoce.com.br':
             return jsonify({'error': 'Acesso negado'}), 403
         
         # Buscar consultas disputadas
@@ -85,7 +85,7 @@ def resolve_dispute(user_id, appointment_id):
     try:
         # Verificar se é admin
         user = db.query(User).filter(User.id == user_id).first()
-        if not user or user.email != 'admin@vitabrasil.com':
+        if not user or user.email != 'admin@consultavoce.com.br':
             return jsonify({'error': 'Acesso negado'}), 403
         
         data = request.get_json()
