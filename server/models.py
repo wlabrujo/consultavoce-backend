@@ -51,6 +51,9 @@ class User(Base):
     in_person_enabled = Column(Boolean, default=True)
     home_enabled = Column(Boolean, default=False)
     
+    # Duração dos slots de agendamento (em minutos)
+    slot_duration = Column(Integer, default=30)  # 15, 30, 45 ou 60 minutos
+    
     # Foto de perfil
     photo_url = Column(String(500))
     
