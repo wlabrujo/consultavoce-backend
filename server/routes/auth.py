@@ -53,7 +53,8 @@ def user_to_dict(user):
             'regulatoryBody': user.regulatory_body,
             'registrationNumber': user.registration_number,
             'description': user.description,
-            'photo_url': user.photo_url
+            'photo_url': user.photo_url,
+            'slot_duration': user.slot_duration if hasattr(user, 'slot_duration') else 30
         })
         
         # Adicionar especialidades

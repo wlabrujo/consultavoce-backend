@@ -123,6 +123,12 @@ def update_profile():
                 user.in_person_enabled = data['inPersonEnabled']
             if 'homeEnabled' in data:
                 user.home_enabled = data['homeEnabled']
+            
+            # Atualizar duração dos slots de agendamento
+            if 'slot_duration' in data:
+                slot_duration = int(data['slot_duration'])
+                if slot_duration in [15, 30, 45, 60]:
+                    user.slot_duration = slot_duration
         
         db.commit()
         db.refresh(user)
