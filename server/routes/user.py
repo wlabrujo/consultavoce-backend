@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify
 import jwt
 import os
+import base64
+import uuid
+from pathlib import Path
 from database import SessionLocal
 from models import User
 from routes.auth import user_to_dict
@@ -141,6 +144,86 @@ def update_profile():
     except Exception as e:
         db.rollback()
         return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+
+
+@user_bp.route('/profile/photo', methods=['POST'])
+def upload_profile_photo():
+    """Upload de foto de perfil (base64)"""
+    db = SessionLocal()
+    try:
+        # Obter token
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Token não fornecido'}), 401
+        
+        token = auth_header.split(' ')[1] if ' ' in auth_header else auth_header
+        user_id = get_user_from_token(token)
+        
+        if not user_id:
+            return jsonify({'error': 'Token inválido'}), 401
+        
+        # Buscar usuário
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return jsonify({'error': 'Usuário não encontrado'}), 404
+        
+        data = request.get_json()
+        if not data or 'image' not in data:
+            return jsonify({'error': 'Imagem não fornecida'}), 400
+        
+        # Extrair dados da imagem base64
+        image_data = data['image']
+        
+        # Verificar se é base64 válido
+        if not image_data.startswith('data:image'):
+            return jsonify({'error': 'Formato de imagem inválido'}), 400
+        
+        # Extrair tipo e dados
+        header, encoded = image_data.split(',', 1)
+        extension = header.split('/')[1].split(';')[0]  # jpg, png, etc
+        
+        # Validar extensão
+        if extension not in ['jpeg', 'jpg', 'png', 'webp']:
+            return jsonify({'error': 'Formato não suportado. Use JPG, PNG ou WEBP'}), 400
+        
+        # Decodificar base64
+        image_bytes = base64.b64decode(encoded)
+        
+        # Verificar tamanho (máximo 5MB)
+        if len(image_bytes) > 5 * 1024 * 1024:
+            return jsonify({'error': 'Imagem muito grande. Máximo 5MB'}), 400
+        
+        # Criar diretório de uploads se não existir
+        upload_dir = Path('uploads/profile_photos')
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Gerar nome único para o arquivo
+        filename = f"{user_id}_{uuid.uuid4().hex[:8]}.{extension}"
+        filepath = upload_dir / filename
+        
+        # Salvar arquivo
+        with open(filepath, 'wb') as f:
+            f.write(image_bytes)
+        
+        # Atualizar URL da foto no banco
+        photo_url = f"/uploads/profile_photos/{filename}"
+        user.photo_url = photo_url
+        
+        db.commit()
+        db.refresh(user)
+        
+        return jsonify({
+            'message': 'Foto atualizada com sucesso',
+            'photo_url': photo_url,
+            'user': user_to_dict(user)
+        }), 200
+        
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': f'Erro ao fazer upload: {str(e)}'}), 500
     finally:
         db.close()
 

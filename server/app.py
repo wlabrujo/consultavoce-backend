@@ -32,6 +32,11 @@ def serve(path=''):
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
+# Servir arquivos de upload
+@app.route('/uploads/<path:filename>')
+def serve_upload(filename):
+    return send_from_directory('uploads', filename)
+
 # Health check
 @app.route('/api/health')
 def health():
