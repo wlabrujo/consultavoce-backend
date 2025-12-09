@@ -32,3 +32,4 @@ Este projeto está configurado para deploy automático no Railway.
 - `SECRET_KEY`: Chave secreta para JWT
 - `ALGORITHM`: Algoritmo de criptografia (HS256)
 
+# Backend atualizado - Tue Dec  9 16:15:45 EST 2025
