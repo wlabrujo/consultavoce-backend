@@ -40,7 +40,7 @@ try:
     app.register_blueprint(availability_bp, url_prefix='/api/availability')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(review_bp, url_prefix='/api/reviews')
-    app.register_blueprint(slots_bp, url_prefix='/api/professionals')
+    app.register_blueprint(slots_bp, url_prefix='/api/slots')
 except Exception as e:
     print(f"Warning: Could not import routes: {e}")
 
