@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from datetime import datetime, timedelta
-from server.models import Professional, Availability, Appointment
+from server.models import User, Availability, Appointment
 from server.database import db
 
 slots_bp = Blueprint('slots', __name__)
@@ -33,7 +33,7 @@ def get_available_slots(professional_id):
             return jsonify({'error': 'Data deve ser futura'}), 400
         
         # Buscar profissional
-        professional = Professional.query.get(professional_id)
+        professional = User.query.get(professional_id)
         if not professional:
             return jsonify({'error': 'Profissional não encontrado'}), 404
         
