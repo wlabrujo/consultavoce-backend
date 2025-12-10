@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from datetime import datetime, timedelta
 from server.models import User, Availability, Appointment
-from server.database import db
+from server.database import SessionLocal
 
 slots_bp = Blueprint('slots', __name__)
 
@@ -33,7 +33,8 @@ def get_available_slots(professional_id):
             return jsonify({'error': 'Data deve ser futura'}), 400
         
         # Buscar profissional
-        professional = User.query.get(professional_id)
+        db = SessionLocal()
+        professional = db.query(User).get(professional_id)
         if not professional:
             return jsonify({'error': 'Profissional não encontrado'}), 404
         
@@ -41,7 +42,7 @@ def get_available_slots(professional_id):
         day_of_week = (selected_date.weekday() + 1) % 7  # Converter para formato do banco
         
         # Buscar disponibilidade do profissional para esse dia
-        availabilities = Availability.query.filter_by(
+        availabilities = db.query(Availability).filter_by(
             professional_id=professional_id,
             day_of_week=day_of_week,
             is_active=True
@@ -68,7 +69,7 @@ def get_available_slots(professional_id):
                 slot_time = current_slot.strftime('%H:%M')
                 
                 # Verificar se o slot já está ocupado
-                is_booked = Appointment.query.filter_by(
+                is_booked = db.query(Appointment).filter_by(
                     professional_id=professional_id,
                     appointment_date=selected_date,
                     appointment_time=slot_time,
@@ -83,8 +84,11 @@ def get_available_slots(professional_id):
         # Ordenar slots
         all_slots.sort()
         
-        return jsonify({'slots': all_slots}), 200
+        db.close()
+        return jsonify({"slots": all_slots}), 200
         
     except Exception as e:
+        if 'db' in locals():
+            db.close()
         print(f"Erro ao gerar slots: {str(e)}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
