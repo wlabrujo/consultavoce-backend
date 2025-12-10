@@ -4,9 +4,10 @@ from datetime import datetime
 from database import Base
 
 # Tabela de associação para especialidades (muitos-para-muitos)
-user_specialties = Table('user_specialties', Base.metadata, extend_existing=True,
-    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
-    Column('specialty_id', Integer, ForeignKey('specialties.id'), primary_key=True)
+user_specialties = Table("user_specialties", Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("specialty_id", Integer, ForeignKey("specialties.id"), primary_key=True),
+    extend_existing=True
 )
 
 class User(Base):
