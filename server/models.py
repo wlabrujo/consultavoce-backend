@@ -11,6 +11,7 @@ user_specialties = Table("user_specialties", Base.metadata,
 )
 
 class User(Base):
+    __table_args__ = {"extend_existing": True}
     __tablename__ = 'users'
     
     id = Column(Integer, primary_key=True, index=True)
@@ -70,6 +71,7 @@ class User(Base):
     reviews_given = relationship('Review', foreign_keys='Review.patient_id', back_populates='patient')
 
 class Specialty(Base):
+    __table_args__ = {"extend_existing": True}
     __tablename__ = 'specialties'
     
     id = Column(Integer, primary_key=True, index=True)
@@ -78,6 +80,7 @@ class Specialty(Base):
     users = relationship('User', secondary=user_specialties, back_populates='specialties')
 
 class Appointment(Base):
+    __table_args__ = {"extend_existing": True}
     __tablename__ = 'appointments'
     
     id = Column(Integer, primary_key=True, index=True)
@@ -113,6 +116,7 @@ class Appointment(Base):
     review = relationship('Review', back_populates='appointment', uselist=False)
 
 class Review(Base):
+    __table_args__ = {"extend_existing": True}
     __tablename__ = 'reviews'
     
     id = Column(Integer, primary_key=True, index=True)
@@ -131,6 +135,7 @@ class Review(Base):
     professional = relationship('User', foreign_keys=[professional_id], back_populates='reviews_received')
 
 class Payment(Base):
+    __table_args__ = {"extend_existing": True}
     __tablename__ = 'payments'
     
     id = Column(Integer, primary_key=True, index=True)
@@ -148,6 +153,7 @@ class Payment(Base):
 
 
 class Favorite(Base):
+    __table_args__ = {"extend_existing": True}
     __tablename__ = 'favorites'
     
     id = Column(Integer, primary_key=True, index=True)
@@ -162,6 +168,7 @@ class Favorite(Base):
 
 
 class Availability(Base):
+    __table_args__ = {"extend_existing": True}
     __tablename__ = 'availability'
     
     id = Column(Integer, primary_key=True, index=True)
