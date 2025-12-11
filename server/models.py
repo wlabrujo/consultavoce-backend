@@ -64,11 +64,11 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relacionamentos
-    specialties = relationship('Specialty', secondary=user_specialties, back_populates='users')
-    appointments_as_patient = relationship('Appointment', foreign_keys='Appointment.patient_id', back_populates='patient')
-    appointments_as_professional = relationship('Appointment', foreign_keys='Appointment.professional_id', back_populates='professional')
-    reviews_received = relationship('Review', foreign_keys='Review.professional_id', back_populates='professional')
-    reviews_given = relationship('Review', foreign_keys='Review.patient_id', back_populates='patient')
+    specialties = relationship('server.models.Specialty', secondary=user_specialties, back_populates='users')
+    appointments_as_patient = relationship('server.models.Appointment', foreign_keys='Appointment.patient_id', back_populates='patient')
+    appointments_as_professional = relationship('server.models.Appointment', foreign_keys='Appointment.professional_id', back_populates='professional')
+    reviews_received = relationship('server.models.Review', foreign_keys='Review.professional_id', back_populates='professional')
+    reviews_given = relationship('server.models.Review', foreign_keys='Review.patient_id', back_populates='patient')
 
 class Specialty(Base):
     __table_args__ = {"extend_existing": True}
@@ -77,7 +77,7 @@ class Specialty(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), unique=True, nullable=False, index=True)
     
-    users = relationship('User', secondary=user_specialties, back_populates='specialties')
+    users = relationship('server.models.User', secondary=user_specialties, back_populates='specialties')
 
 class Appointment(Base):
     __table_args__ = {"extend_existing": True}
@@ -111,9 +111,9 @@ class Appointment(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relacionamentos
-    patient = relationship('User', foreign_keys=[patient_id], back_populates='appointments_as_patient')
-    professional = relationship('User', foreign_keys=[professional_id], back_populates='appointments_as_professional')
-    review = relationship('Review', back_populates='appointment', uselist=False)
+    patient = relationship('server.models.User', foreign_keys=[patient_id], back_populates='appointments_as_patient')
+    professional = relationship('server.models.User', foreign_keys=[professional_id], back_populates='appointments_as_professional')
+    review = relationship('server.models.Review', back_populates='appointment', uselist=False)
 
 class Review(Base):
     __table_args__ = {"extend_existing": True}
@@ -130,9 +130,9 @@ class Review(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relacionamentos
-    appointment = relationship('Appointment', back_populates='review')
-    patient = relationship('User', foreign_keys=[patient_id], back_populates='reviews_given')
-    professional = relationship('User', foreign_keys=[professional_id], back_populates='reviews_received')
+    appointment = relationship('server.models.Appointment', back_populates='review')
+    patient = relationship('server.models.User', foreign_keys=[patient_id], back_populates='reviews_given')
+    professional = relationship('server.models.User', foreign_keys=[professional_id], back_populates='reviews_received')
 
 class Payment(Base):
     __table_args__ = {"extend_existing": True}
@@ -163,8 +163,8 @@ class Favorite(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relacionamentos
-    patient = relationship('User', foreign_keys=[patient_id])
-    professional = relationship('User', foreign_keys=[professional_id])
+    patient = relationship('server.models.User', foreign_keys=[patient_id])
+    professional = relationship('server.models.User', foreign_keys=[professional_id])
 
 
 class Availability(Base):
@@ -184,5 +184,5 @@ class Availability(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relacionamento
-    professional = relationship('User', foreign_keys=[professional_id])
+    professional = relationship('server.models.User', foreign_keys=[professional_id])
 
